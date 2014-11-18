@@ -14,6 +14,8 @@
               and compile the less css files into ./css when they are added/changed
 */
 var allowedExtensions = ['less'];
+var filesToCompile = ['style.less']
+
 var sys = require('util')
   , fs = require('fs')
   , path = require('path')
@@ -143,6 +145,7 @@ function getFileExtension(string){
 
 // Here's where we run the less compiler
 function compileCSS(file){
+  console.log(file);
     var filename = getFilenameWithoutExtention(file);
     var command = 'lessc -x '+file.replace(/\s+/g,'\\ ')+' '+argvs[1]+'/'+filename.replace(/\s+/g,'\\ ')+'.css';
     // Run the command
@@ -158,9 +161,7 @@ function compileCSS(file){
 function filterFiles(f, stat){
   var filename = getFilenameWithoutExtention(f);
   var extension = getFileExtension(f);
-  if (filename.substr(0,1) == '_' ||
-      filename.substr(0,1) == '.' ||
-      filename == '' ||
+  if (filename == '' ||
       allowedExtensions.indexOf(extension) == -1
       )
     return true;
@@ -203,10 +204,17 @@ watchTree(
     } else {
       // f is a new file or changed
       console.log('The file: ' + f + ' was changed. Recompiling CSS at ' + getDateTime());
-      compileCSS(f);
+      var arrayLength = filesToCompile.length;
+      for (var i = 0; i < arrayLength; i++) {
+        compileCSS(argvs[0] + '/' + filesToCompile[i]);
+      }
+
     }
   },
   function(f){
-     compileCSS(f);
+    var arrayLength = filesToCompile.length;
+    for (var i = 0; i < arrayLength; i++) {
+      compileCSS(argvs[0] + '/' + filesToCompile[i]);
+    }
   }
 );
